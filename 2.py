@@ -149,3 +149,85 @@ else:
 print(f"Interpretacja:                efekt {effect_size}")
 
 print("="*60)
+
+
+
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Konfiguracja
+sns.set_style("whitegrid")
+fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+fig.suptitle('Analiza Testów Statystycznych', fontsize=16, fontweight='bold')
+
+# 1. Test t dla jednej próbki - rozkład próbki
+axes[0, 0].hist(baterie, bins=8, edgecolor='black', alpha=0.7, color='skyblue')
+axes[0, 0].axvline(np.mean(baterie), color='red', linestyle='--', linewidth=2,
+                   label=f'Średnia próbki: {np.mean(baterie):.1f}')
+axes[0, 0].axvline(mu_0, color='green', linestyle='--', linewidth=2,
+                   label=f'H_0: μ = {mu_0}')
+axes[0, 0].set_xlabel('Czas działania [godz.]')
+axes[0, 0].set_ylabel('Częstość')
+axes[0, 0].set_title('Test t (1 próbka): Rozkład Danych')
+axes[0, 0].legend()
+axes[0, 0].grid(True, alpha=0.3)
+
+# 2. Rozkład t-Studenta z zaznaczonymi wartościami krytycznymi
+x = np.linspace(-4, 4, 1000)
+y = stats.t.pdf(x, df=len(baterie)-1)
+
+axes[0, 1].plot(x, y, 'b-', linewidth=2, label='Rozkład t-Studenta')
+axes[0, 1].axvline(t_statistic, color='red', linestyle='--', linewidth=2,
+                   label=f't = {t_statistic:.3f}')
+axes[0, 1].axvline(-t_critical, color='green', linestyle=':', linewidth=2,
+                   label=f't_kryt = ±{t_critical:.3f}')
+axes[0, 1].axvline(t_critical, color='green', linestyle=':', linewidth=2)
+
+# Obszar odrzucenia
+x_left = np.linspace(-4, -t_critical, 100)
+x_right = np.linspace(t_critical, 4, 100)
+axes[0, 1].fill_between(x_left, stats.t.pdf(x_left, df=len(baterie)-1),
+                        alpha=0.3, color='red', label='Obszar odrzucenia')
+axes[0, 1].fill_between(x_right, stats.t.pdf(x_right, df=len(baterie)-1),
+                        alpha=0.3, color='red')
+
+axes[0, 1].set_xlabel('Wartość t')
+axes[0, 1].set_ylabel('Gęstość')
+axes[0, 1].set_title(f'Rozkład t-Studenta (df={len(baterie)-1})')
+axes[0, 1].legend()
+axes[0, 1].grid(True, alpha=0.3)
+
+# 3. Porównanie dwóch grup - boxploty
+bp = axes[1, 0].boxplot([grupa_a, grupa_b], tick_labels=['Grupa A', 'Grupa B'],
+                        patch_artist=True,
+                        boxprops=dict(facecolor='lightblue'),
+                        medianprops=dict(color='red', linewidth=2))
+axes[1, 0].set_ylabel('Wyniki [pkt]')
+axes[1, 0].set_title('Porównanie Dwóch Grup')
+axes[1, 0].grid(True, alpha=0.3, axis='y')
+
+# Adnotacje
+axes[1, 0].text(1, np.mean(grupa_a), f'x̄={np.mean(grupa_a):.1f}',
+               fontsize=10, ha='right')
+axes[1, 0].text(2, np.mean(grupa_b), f'x̄={np.mean(grupa_b):.1f}',
+               fontsize=10, ha='left')
+
+# 4. Porównanie rozkładów
+axes[1, 1].hist(grupa_a, bins=6, alpha=0.5, label='Grupa A',
+               edgecolor='black', color='blue', density=True)
+axes[1, 1].hist(grupa_b, bins=6, alpha=0.5, label='Grupa B',
+               edgecolor='black', color='orange', density=True)
+axes[1, 1].axvline(np.mean(grupa_a), color='blue', linestyle='--', linewidth=2)
+axes[1, 1].axvline(np.mean(grupa_b), color='orange', linestyle='--', linewidth=2)
+axes[1, 1].set_xlabel('Wyniki [pkt]')
+axes[1, 1].set_ylabel('Gęstość')
+axes[1, 1].set_title('Rozkłady Dwóch Grup')
+axes[1, 1].legend()
+axes[1, 1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig('testy_statystyczne_wizualizacje.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+print("\nWizualizacja została zapisana jako 'testy_statystyczne_wizualizacje.png'")
