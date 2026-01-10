@@ -69,4 +69,4 @@ print(df["wynik"].describe().round(2))
 
 print(f"Średnia arytmetyczna: {df["wynik"].mean().round(2)}")
 print(f"Mediana:              {df["wynik"].median().round(2)}")
-print(f"Q1:                   {df["wynik"].quantile(0.25)}")
+print(f"Q1:                   {df["wynik"].quantile(0.25, interpolation = 'midpoint')}")
