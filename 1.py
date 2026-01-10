@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 import pandas as pd
@@ -51,22 +52,33 @@ wyniki = np.array([65, 70, 75, 80, 80, 85, 85, 85, 90, 95, 100, 150])
 # print(tabela2)
 
 
-df = pd.DataFrame({
-    'student': [f"Strudent {i}" for i in range(1,13)],
-    'wynik': wyniki
-})
+# df = pd.DataFrame({
+#     'student': [f"Strudent {i}" for i in range(1,13)],
+#     'wynik': wyniki
+# })
+#
+# print("ANALIZA Z UŻYCIEM PANDASA")
+#
+# print("Pięć pierwszych rekordów próbki:")
+# print(df.head())
+#
+# print("Informacje o DataFrame:")
+# print(df.info())
+#
+# print("Statystyki:")
+# print(df["wynik"].describe().round(2))
+#
+# print(f"Średnia arytmetyczna: {df["wynik"].mean().round(2)}")
+# print(f"Mediana:              {df["wynik"].median().round(2)}")
+# print(f"Q1:                   {df["wynik"].quantile(0.25, interpolation = 'midpoint')}")
 
-print("ANALIZA Z UŻYCIEM PANDASA")
 
-print("Pięć pierwszych rekordów próbki:")
-print(df.head())
-
-print("Informacje o DataFrame:")
-print(df.info())
-
-print("Statystyki:")
-print(df["wynik"].describe().round(2))
-
-print(f"Średnia arytmetyczna: {df["wynik"].mean().round(2)}")
-print(f"Mediana:              {df["wynik"].median().round(2)}")
-print(f"Q1:                   {df["wynik"].quantile(0.25, interpolation = 'midpoint')}")
+plt.figure(figsize=(10,5))
+plt.hist(wyniki, bins=9, color="red", edgecolor="black", alpha=0.5, density=True)
+plt.axvline(np.mean(wyniki), color="blue", linestyle="--", label=f"Średnia: {np.mean(wyniki):.2f}")
+plt.axvline(np.median(wyniki), color="black", linestyle="--", label=f"Mediana: {np.median(wyniki):.2f}")
+plt.xlabel("Wyniki")
+plt.ylabel("Gęstość")
+plt.title("Histogram")
+plt.legend()
+plt.show()
