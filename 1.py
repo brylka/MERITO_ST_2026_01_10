@@ -22,13 +22,21 @@ print(f"Wariancja:            {np.var(wyniki, ddof=1):.2f}")
 print(f"Odchylenie std:       {np.std(wyniki, ddof=1):.2f}")
 
 print("KWARTYLE:")
-q1 = np.percentile(wyniki, 25)
-q2 = np.percentile(wyniki, 50)
-q3 = np.percentile(wyniki, 75)
+q1 = np.percentile(wyniki, 25, method="midpoint")
+q2 = np.percentile(wyniki, 50, method="midpoint")
+q3 = np.percentile(wyniki, 75, method="midpoint")
 print(f"Q1:                   {q1:.2f}")
 print(f"Q2:                   {q2:.2f}")
 print(f"Q3:                   {q3:.2f}")
 print(f"IQR:                  {q3-q1:.2f}")
 
-print(f"Dolna granica:        {q1 - 1.5 * (q3-q1)}")
-print(f"Górna granica:        {q3 + 1.5 * (q3-q1)}")
+d_g = q1 - 1.5 * (q3-q1)
+g_g = q3 + 1.5 * (q3-q1)
+print(f"Dolna granica:        {d_g}")
+print(f"Górna granica:        {g_g}")
+
+outliery = wyniki[(wyniki < d_g) | (wyniki > g_g)]
+if len(outliery) > 0:
+    print(f"Wykryte wartości odstające (outliery): {outliery}")
+else:
+    print("Brak wartości odstających (outlierów).")
