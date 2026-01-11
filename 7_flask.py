@@ -10,38 +10,39 @@ model = load_model('model.keras')
 scaler = joblib.load('scaler.pkl')
 
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def index():
-    new_property = {
-        'MedInc': 8.32,
-        'HouseAge': 25,
-        'AveRooms': 6.23,
-        'AveBedrms': 1.01,
-        'Population': 1800,
-        'AveOccup': 3.5,
-        'Latitude': 37.88,
-        'Longitude': -122.23
-    }
+    formatted_value = None
+    new_property = []
+    if request.method == 'POST':
+        new_property = {
+            'MedInc': float(request.form['MedInc']),
+            'HouseAge': float(request.form['HouseAge']),
+            'AveRooms': float(request.form['AveRooms']),
+            'AveBedrms': float(request.form['AveBedrms']),
+            'Population': float(request.form['Population']),
+            'AveOccup': float(request.form['AveOccup']),
+            'Latitude': float(request.form['Latitude']),
+            'Longitude': float(request.form['Longitude'])
+        }
 
-    # Tworzenie DataFrame z nowymi danymi
-    new_property_df = pd.DataFrame([new_property])
+        # Tworzenie DataFrame z nowymi danymi
+        new_property_df = pd.DataFrame([new_property])
 
-    # Skalowanie danych wejściowych przy użyciu tego samego skalera użytego do trenowania modelu
-    scaled_new_property = scaler.transform(new_property_df)
+        # Skalowanie danych wejściowych przy użyciu tego samego skalera użytego do trenowania modelu
+        scaled_new_property = scaler.transform(new_property_df)
 
-    # Prognozowanie ceny przy użyciu wytrenowanego modelu
-    predicted_price = model.predict(scaled_new_property)
+        # Prognozowanie ceny przy użyciu wytrenowanego modelu
+        predicted_price = model.predict(scaled_new_property)
 
-    # Wypisanie prognozowanej ceny
-    #print(f'Prognozowana cena nieruchomości: {predicted_price[0][0]:.3f} (w jednostkach 100.000 USD)')
+        # Obliczenie wartości nieruchomości
+        property_value = predicted_price[0][0] * 100000
+        # Formatowanie wartości z separatorem
+        formatted_value = format(property_value, ',.0f').replace(',', '.')
 
-    # Obliczenie wartości nieruchomości
-    property_value = predicted_price[0][0] * 100000
-    # Formatowanie wartości z separatorem
-    formatted_value = format(property_value, ',.0f').replace(',', '.')
-    # Wydrukowanie prognozowanej ceny nieruchomości z separatorem
-    return f'Prognozowana cena nieruchomości: {formatted_value} dolarów.'
-    #return "<style>* {background-color: red;}</style><h1>Witaj świecie!</h1>"
+    #return f'Prognozowana cena nieruchomości: {formatted_value} dolarów.'
+    return render_template('housing.html', formatted_value=formatted_value, new_property=new_property)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
